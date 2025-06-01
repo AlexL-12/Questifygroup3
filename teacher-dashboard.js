@@ -971,4 +971,41 @@ function showNotification(message, type = 'info', topOffset = 20) {
 
 // Initial display
 displayAssignments();
-updateStats(); 
+updateStats();
+
+async function loadFeedback() {
+    try {
+        const response = await fetch('/api/feedback');
+        if (!response.ok) {
+            throw new Error('Failed to fetch feedback');
+        }
+
+        const feedback = await response.json();
+        const feedbackList = document.querySelector('.feedback-list');
+        
+        if (feedback.length === 0) {
+            feedbackList.innerHTML = '<div class="no-feedback">No feedback received yet</div>';
+            return;
+        }
+
+        feedbackList.innerHTML = feedback.map(item => `
+            <div class="feedback-item">
+                <div class="feedback-meta">
+                    <span>Assignment: ${item.assignmentTitle}</span>
+                    <span>${new Date(item.timestamp).toLocaleString()}</span>
+                </div>
+                <div class="feedback-content">${item.feedback}</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading feedback:', error);
+        const feedbackList = document.querySelector('.feedback-list');
+        feedbackList.innerHTML = '<div class="no-feedback">Error loading feedback. Please try again later.</div>';
+    }
+}
+
+// Add this to your initialization code
+document.addEventListener('DOMContentLoaded', () => {
+    // ... existing initialization code ...
+    loadFeedback();
+}); 

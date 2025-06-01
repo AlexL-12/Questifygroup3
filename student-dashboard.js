@@ -662,4 +662,73 @@ notificationStyles.textContent = `
         }
     }
 `;
-document.head.appendChild(notificationStyles); 
+document.head.appendChild(notificationStyles);
+
+function createAssignmentCard(assignment) {
+    const card = document.createElement('div');
+    card.className = 'assignment-card';
+    card.innerHTML = `
+        <div class="assignment-header">
+            <h3 class="assignment-title">${assignment.title}</h3>
+            <span class="due-date">Due: ${new Date(assignment.dueDate).toLocaleDateString()}</span>
+        </div>
+        <p class="assignment-description">${assignment.description}</p>
+        <button class="feedback-btn">Provide Feedback</button>
+        <div class="feedback-form">
+            <textarea class="feedback-textarea" placeholder="Enter your feedback about this assignment..."></textarea>
+            <button class="submit-feedback-btn">Submit Feedback</button>
+        </div>
+    `;
+
+    // Add feedback functionality
+    const feedbackBtn = card.querySelector('.feedback-btn');
+    const feedbackForm = card.querySelector('.feedback-form');
+    const submitFeedbackBtn = card.querySelector('.submit-feedback-btn');
+    const feedbackTextarea = card.querySelector('.feedback-textarea');
+
+    feedbackBtn.addEventListener('click', () => {
+        feedbackForm.classList.toggle('active');
+        if (feedbackForm.classList.contains('active')) {
+            feedbackBtn.textContent = 'Cancel Feedback';
+        } else {
+            feedbackBtn.textContent = 'Provide Feedback';
+            feedbackTextarea.value = '';
+        }
+    });
+
+    submitFeedbackBtn.addEventListener('click', async () => {
+        const feedback = feedbackTextarea.value.trim();
+        if (!feedback) {
+            alert('Please enter your feedback before submitting.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    assignmentId: assignment.id,
+                    feedback: feedback,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (response.ok) {
+                alert('Feedback submitted successfully!');
+                feedbackForm.classList.remove('active');
+                feedbackBtn.textContent = 'Provide Feedback';
+                feedbackTextarea.value = '';
+            } else {
+                throw new Error('Failed to submit feedback');
+            }
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            alert('Failed to submit feedback. Please try again.');
+        }
+    });
+
+    return card;
+} 
