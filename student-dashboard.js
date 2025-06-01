@@ -184,6 +184,13 @@ function displayAssignments() {
     const unsubmittedContainer = document.getElementById('unsubmitted-assignments');
     const submittedContainer = document.getElementById('submitted-assignments');
     
+    // Add feedback button to the top of the dashboard
+    const feedbackButton = document.createElement('button');
+    feedbackButton.className = 'feedback-button';
+    feedbackButton.innerHTML = '📝 Give Feedback';
+    feedbackButton.onclick = showFeedbackPanel;
+    document.querySelector('.container').insertBefore(feedbackButton, document.querySelector('.stats-container'));
+
     // Filter assignments
     const unsubmittedAssignments = assignments.filter(a => 
         !a.submissions.some(sub => sub.studentId === currentUser.id)
@@ -866,4 +873,197 @@ async function submitFeedback(assignmentId) {
         console.error('Error submitting feedback:', error);
         alert('Failed to submit feedback. Please try again.');
     }
-} 
+}
+
+// Add these new functions after the existing functions
+function showFeedbackPanel() {
+    // Create feedback panel if it doesn't exist
+    let feedbackPanel = document.getElementById('feedback-panel');
+    if (!feedbackPanel) {
+        feedbackPanel = document.createElement('div');
+        feedbackPanel.id = 'feedback-panel';
+        feedbackPanel.className = 'feedback-panel';
+        feedbackPanel.innerHTML = `
+            <div class="feedback-panel-content">
+                <div class="feedback-panel-header">
+                    <h3>Give Feedback</h3>
+                    <button class="close-btn" onclick="closeFeedbackPanel()">×</button>
+                </div>
+                <div class="feedback-panel-body">
+                    <textarea id="feedback-text" placeholder="Enter your feedback here..."></textarea>
+                    <button class="submit-feedback-btn" onclick="submitGeneralFeedback()">Submit Feedback</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(feedbackPanel);
+    }
+    
+    // Show the panel
+    feedbackPanel.style.display = 'flex';
+}
+
+function closeFeedbackPanel() {
+    const feedbackPanel = document.getElementById('feedback-panel');
+    if (feedbackPanel) {
+        feedbackPanel.style.display = 'none';
+        document.getElementById('feedback-text').value = '';
+    }
+}
+
+async function submitGeneralFeedback() {
+    const feedbackText = document.getElementById('feedback-text').value.trim();
+    
+    if (!feedbackText) {
+        alert('Please enter your feedback before submitting.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                studentId: currentUser.id,
+                studentName: currentUser.name,
+                feedback: feedbackText,
+                timestamp: new Date().toISOString(),
+                type: 'general'
+            })
+        });
+
+        if (response.ok) {
+            alert('Feedback submitted successfully!');
+            closeFeedbackPanel();
+        } else {
+            throw new Error('Failed to submit feedback');
+        }
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        alert('Failed to submit feedback. Please try again.');
+    }
+}
+
+// Add these styles to the existing styles
+const additionalStyles = document.createElement('style');
+additionalStyles.textContent = `
+    .feedback-button {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.3s;
+    }
+
+    .feedback-button:hover {
+        background: var(--secondary-blue);
+    }
+
+    .feedback-panel {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .feedback-panel-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .feedback-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-gray);
+    }
+
+    .feedback-panel-header h3 {
+        margin: 0;
+        color: var(--primary-blue);
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0.5rem;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        color: var(--accent-red);
+    }
+
+    .feedback-panel-body {
+        padding: 1.5rem;
+    }
+
+    #feedback-text {
+        width: 100%;
+        min-height: 150px;
+        padding: 1rem;
+        border: 1px solid var(--border-gray);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-family: inherit;
+        font-size: 1rem;
+        resize: vertical;
+    }
+
+    #feedback-text:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+
+    .submit-feedback-btn {
+        background: var(--success-green);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        width: 100%;
+        transition: background 0.3s;
+    }
+
+    .submit-feedback-btn:hover {
+        background: #218838;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(additionalStyles); 
