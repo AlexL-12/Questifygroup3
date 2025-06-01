@@ -294,6 +294,13 @@ function displayAssignments() {
                                 ` : ''}
                             </div>
                         ` : ''}
+                        <div class="feedback-section">
+                            <button class="feedback-btn" onclick="toggleFeedbackForm(${assignment.id})">Provide Feedback</button>
+                            <div id="feedback-form-${assignment.id}" class="feedback-form" style="display: none;">
+                                <textarea class="feedback-textarea" placeholder="Enter your feedback about this assignment..."></textarea>
+                                <button class="submit-feedback-btn" onclick="submitFeedback(${assignment.id})">Submit Feedback</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -651,6 +658,63 @@ notificationStyles.textContent = `
         top: 300px;
     }
 
+    .feedback-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-gray);
+    }
+
+    .feedback-btn {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .feedback-btn:hover {
+        background: var(--secondary-blue);
+    }
+
+    .feedback-form {
+        margin-top: 1rem;
+        background: var(--light-gray);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .feedback-textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 0.75rem;
+        border: 1px solid var(--border-gray);
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .feedback-textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+
+    .submit-feedback-btn {
+        background: var(--success-green);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .submit-feedback-btn:hover {
+        background: #218838;
+    }
+
     @keyframes slideIn {
         from {
             transform: translateX(100%);
@@ -752,4 +816,54 @@ function createAssignmentCard(assignment) {
     }
 
     return card;
+}
+
+function toggleFeedbackForm(assignmentId) {
+    const feedbackForm = document.getElementById(`feedback-form-${assignmentId}`);
+    const feedbackBtn = feedbackForm.previousElementSibling;
+    
+    if (feedbackForm.style.display === 'none') {
+        feedbackForm.style.display = 'block';
+        feedbackBtn.textContent = 'Cancel Feedback';
+    } else {
+        feedbackForm.style.display = 'none';
+        feedbackBtn.textContent = 'Provide Feedback';
+        feedbackForm.querySelector('.feedback-textarea').value = '';
+    }
+}
+
+async function submitFeedback(assignmentId) {
+    const feedbackForm = document.getElementById(`feedback-form-${assignmentId}`);
+    const feedbackText = feedbackForm.querySelector('.feedback-textarea').value.trim();
+    
+    if (!feedbackText) {
+        alert('Please enter your feedback before submitting.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                assignmentId: assignmentId,
+                studentId: currentUser.id,
+                studentName: currentUser.name,
+                feedback: feedbackText,
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        if (response.ok) {
+            alert('Feedback submitted successfully!');
+            toggleFeedbackForm(assignmentId);
+        } else {
+            throw new Error('Failed to submit feedback');
+        }
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        alert('Failed to submit feedback. Please try again.');
+    }
 } 
