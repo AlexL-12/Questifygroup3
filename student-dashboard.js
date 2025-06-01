@@ -852,13 +852,19 @@ async function submitFeedback(assignmentId) {
                 studentId: currentUser.id,
                 studentName: currentUser.name,
                 feedback: feedbackText,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                type: 'assignment'
             })
         });
 
         if (response.ok) {
-            alert('Feedback submitted successfully!');
-            toggleFeedbackForm(assignmentId);
+            const result = await response.json();
+            if (result.success) {
+                alert('Feedback submitted successfully!');
+                toggleFeedbackForm(assignmentId);
+            } else {
+                throw new Error(result.message || 'Failed to submit feedback');
+            }
         } else {
             throw new Error('Failed to submit feedback');
         }
@@ -889,7 +895,7 @@ async function submitGeneralFeedback() {
     }
 
     try {
-        const response = await fetch('/api/feedback', {
+        const response = await fetch('http://localhost:3000/api/feedback', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -904,8 +910,13 @@ async function submitGeneralFeedback() {
         });
 
         if (response.ok) {
-            alert('Feedback submitted successfully!');
-            closeFeedbackPanel();
+            const result = await response.json();
+            if (result.success) {
+                alert('Feedback submitted successfully!');
+                closeFeedbackPanel();
+            } else {
+                throw new Error(result.message || 'Failed to submit feedback');
+            }
         } else {
             throw new Error('Failed to submit feedback');
         }

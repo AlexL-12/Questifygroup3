@@ -974,55 +974,77 @@ displayAssignments();
 updateStats();
 
 async function loadFeedback() {
+    const feedbackList = document.getElementById('feedback-list');
+    
     try {
-        const response = await fetch('/api/feedback');
+        const response = await fetch('http://localhost:3000/api/feedback');
         if (!response.ok) {
-            throw new Error('Failed to fetch feedback');
+            throw new Error('Failed to load feedback');
         }
-
-        const feedback = await response.json();
-        const feedbackList = document.querySelector('.feedback-list');
         
-        if (feedback.length === 0) {
-            feedbackList.innerHTML = '<div class="no-feedback">No feedback received yet</div>';
+        const feedbacks = await response.json();
+        
+        if (feedbacks.length === 0) {
+            feedbackList.innerHTML = `
+                <div class="no-feedback">
+                    No feedback has been received yet.
+                </div>
+            `;
             return;
         }
 
-        // Group feedback by assignment
-        const feedbackByAssignment = feedback.reduce((acc, item) => {
-            if (!acc[item.assignmentId]) {
-                acc[item.assignmentId] = [];
-            }
-            acc[item.assignmentId].push(item);
-            return acc;
-        }, {});
+        // Group feedback by type (general or assignment)
+        const generalFeedback = feedbacks.filter(f => f.type === 'general');
+        const assignmentFeedback = feedbacks.filter(f => f.type === 'assignment');
 
-        feedbackList.innerHTML = Object.entries(feedbackByAssignment).map(([assignmentId, items]) => {
-            const assignment = assignments.find(a => a.id === parseInt(assignmentId));
-            return `
+        let html = '';
+
+        // Display general feedback
+        if (generalFeedback.length > 0) {
+            html += `
                 <div class="feedback-group">
-                    <h4 class="assignment-title">${assignment ? assignment.title : 'Unknown Assignment'}</h4>
-                    ${items.map(item => `
+                    <h3 class="feedback-group-title">General Feedback</h3>
+                    ${generalFeedback.map(feedback => `
                         <div class="feedback-item">
                             <div class="feedback-meta">
-                                <span class="student-info">From: ${item.studentName}</span>
-                                <span class="feedback-date">${new Date(item.timestamp).toLocaleString()}</span>
+                                <span class="feedback-student">${feedback.studentName}</span>
+                                <span class="feedback-date">${new Date(feedback.timestamp).toLocaleString()}</span>
                             </div>
-                            <div class="feedback-content">${item.feedback}</div>
+                            <div class="feedback-content">${feedback.feedback}</div>
                         </div>
                     `).join('')}
                 </div>
             `;
-        }).join('');
+        }
+
+        // Display assignment feedback
+        if (assignmentFeedback.length > 0) {
+            html += `
+                <div class="feedback-group">
+                    <h3 class="feedback-group-title">Assignment Feedback</h3>
+                    ${assignmentFeedback.map(feedback => `
+                        <div class="feedback-item">
+                            <div class="feedback-meta">
+                                <span class="feedback-student">${feedback.studentName}</span>
+                                <span class="feedback-date">${new Date(feedback.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="feedback-content">${feedback.feedback}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        feedbackList.innerHTML = html;
     } catch (error) {
         console.error('Error loading feedback:', error);
-        const feedbackList = document.querySelector('.feedback-list');
-        feedbackList.innerHTML = '<div class="no-feedback">Error loading feedback. Please try again later.</div>';
+        feedbackList.innerHTML = `
+            <div class="error-message">
+                Failed to load feedback. Please try again later.
+            </div>
+        `;
     }
 }
 
-// Add this to your initialization code
-document.addEventListener('DOMContentLoaded', () => {
-    // ... existing initialization code ...
-    loadFeedback();
-}); 
+// Call loadFeedback when the page loads
+document.addEventListener('DOMContentLoaded', loadFeedback); 
