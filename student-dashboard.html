@@ -46,6 +46,10 @@
             margin-right: auto;
         }
 
+        .feedback-button-container {
+            margin-bottom: 2rem;
+        }
+
         .stats-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -686,6 +690,85 @@
         .submit-feedback-btn:hover {
             background: #218838;
         }
+
+        .feedback-button-container {
+            margin-bottom: 2rem;
+        }
+
+        .feedback-button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .feedback-button:hover {
+            background: var(--secondary-blue);
+        }
+
+        .feedback-icon {
+            margin-right: 0.5rem;
+        }
+
+        .feedback-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feedback-panel-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .feedback-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close-btn {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--hover-red);
+        }
+
+        .feedback-panel-body {
+            margin-bottom: 1rem;
+        }
+
+        .feedback-text {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            resize: vertical;
+        }
     </style>
 </head>
 <body>
@@ -703,20 +786,41 @@
     </nav>
 
     <div class="dashboard-container">
+        <div class="feedback-button-container">
+            <button class="feedback-button" onclick="showFeedbackPanel()">
+                <span class="feedback-icon">📝</span>
+                Give Feedback
+            </button>
+        </div>
+
         <div class="stats-container">
             <div class="stat-card">
-                <div class="stat-number" id="total-available">0</div>
-                <div class="stat-label">Available Assignments</div>
-                </div>
-            <div class="stat-card">
-                <div class="stat-number" id="completed-assignments">0</div>
-                <div class="stat-label">Completed</div>
+                <div class="stat-number" id="total-points">0</div>
+                <div class="stat-label">Total Points</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="pending-assignments">0</div>
-                <div class="stat-label">Pending</div>
-                        </div>
-                    </div>
+                <div class="stat-number" id="current-level">1</div>
+                <div class="stat-label">Current Level</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completed-assignments">0</div>
+                <div class="stat-label">Completed Assignments</div>
+            </div>
+        </div>
+
+        <!-- Add the feedback panel container -->
+        <div id="feedback-panel" class="feedback-panel" style="display: none;">
+            <div class="feedback-panel-content">
+                <div class="feedback-panel-header">
+                    <h3>Give Feedback</h3>
+                    <button class="close-btn" onclick="closeFeedbackPanel()">×</button>
+                </div>
+                <div class="feedback-panel-body">
+                    <textarea id="feedback-text" placeholder="Enter your feedback here..."></textarea>
+                    <button class="submit-feedback-btn" onclick="submitGeneralFeedback()">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
 
         <div class="tabs-container">
             <div class="tabs">
@@ -726,13 +830,13 @@
                 <button class="tab" onclick="switchTab('submitted')">
                     ✓ Submitted Assignments
                 </button>
-    </div>
+            </div>
 
             <div id="unsubmitted-tab" class="tab-content active">
                 <div id="unsubmitted-assignments">
                     <!-- Unsubmitted assignments will be populated here -->
                 </div>
-                </div>
+            </div>
 
             <div id="submitted-tab" class="tab-content">
                 <div id="submitted-assignments">
@@ -780,13 +884,13 @@
         <button class="spin-button" id="spinButton" onclick="handleWheelSpin()">
             Spin the Wheel!
         </button>
-                </div>
+    </div>
 
     <!-- Active Buffs Display -->
     <div class="buff-indicator" id="buffIndicator" style="display: none;">
         <div id="expBuff" style="display: none;">
             2x EXP Boost - <span class="buff-timer" id="expBuffTimer"></span>
-            </div>
+        </div>
         <div id="pointsBuff" style="display: none;">
             2x Points Boost - <span class="buff-timer" id="pointsBuffTimer"></span>
         </div>

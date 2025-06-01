@@ -184,13 +184,6 @@ function displayAssignments() {
     const unsubmittedContainer = document.getElementById('unsubmitted-assignments');
     const submittedContainer = document.getElementById('submitted-assignments');
     
-    // Add feedback button to the top of the dashboard
-    const feedbackButton = document.createElement('button');
-    feedbackButton.className = 'feedback-button';
-    feedbackButton.innerHTML = '📝 Give Feedback';
-    feedbackButton.onclick = showFeedbackPanel;
-    document.querySelector('.container').insertBefore(feedbackButton, document.querySelector('.stats-container'));
-
     // Filter assignments
     const unsubmittedAssignments = assignments.filter(a => 
         !a.submissions.some(sub => sub.studentId === currentUser.id)
@@ -877,37 +870,14 @@ async function submitFeedback(assignmentId) {
 
 // Add these new functions after the existing functions
 function showFeedbackPanel() {
-    // Create feedback panel if it doesn't exist
-    let feedbackPanel = document.getElementById('feedback-panel');
-    if (!feedbackPanel) {
-        feedbackPanel = document.createElement('div');
-        feedbackPanel.id = 'feedback-panel';
-        feedbackPanel.className = 'feedback-panel';
-        feedbackPanel.innerHTML = `
-            <div class="feedback-panel-content">
-                <div class="feedback-panel-header">
-                    <h3>Give Feedback</h3>
-                    <button class="close-btn" onclick="closeFeedbackPanel()">×</button>
-                </div>
-                <div class="feedback-panel-body">
-                    <textarea id="feedback-text" placeholder="Enter your feedback here..."></textarea>
-                    <button class="submit-feedback-btn" onclick="submitGeneralFeedback()">Submit Feedback</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(feedbackPanel);
-    }
-    
-    // Show the panel
+    const feedbackPanel = document.getElementById('feedback-panel');
     feedbackPanel.style.display = 'flex';
 }
 
 function closeFeedbackPanel() {
     const feedbackPanel = document.getElementById('feedback-panel');
-    if (feedbackPanel) {
-        feedbackPanel.style.display = 'none';
-        document.getElementById('feedback-text').value = '';
-    }
+    feedbackPanel.style.display = 'none';
+    document.getElementById('feedback-text').value = '';
 }
 
 async function submitGeneralFeedback() {
