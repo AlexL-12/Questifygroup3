@@ -218,49 +218,65 @@
             margin-top: 2rem;
         }
 
-        .feedback-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
+        .feedback-group {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-gray);
         }
 
-        .feedback-title {
+        .feedback-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .feedback-group .assignment-title {
             color: var(--primary-blue);
-            margin: 0;
+            margin: 0 0 1rem 0;
             font-size: 1.2rem;
         }
 
-        .feedback-list {
-            margin-top: 1rem;
-        }
-
         .feedback-item {
-            border: 1px solid var(--border-gray);
+            background: var(--light-gray);
+            border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1rem;
-            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+
+        .feedback-item:hover {
+            transform: translateY(-2px);
         }
 
         .feedback-meta {
             display: flex;
             justify-content: space-between;
-            color: #666;
-            font-size: 0.9rem;
+            align-items: center;
             margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .student-info {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .feedback-date {
+            color: #666;
         }
 
         .feedback-content {
             color: #333;
             line-height: 1.5;
+            white-space: pre-wrap;
         }
 
         .no-feedback {
             text-align: center;
             color: #666;
             padding: 2rem;
+            background: var(--light-gray);
+            border-radius: 8px;
         }
     </style>
 </head>

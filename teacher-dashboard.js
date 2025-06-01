@@ -988,15 +988,32 @@ async function loadFeedback() {
             return;
         }
 
-        feedbackList.innerHTML = feedback.map(item => `
-            <div class="feedback-item">
-                <div class="feedback-meta">
-                    <span>Assignment: ${item.assignmentTitle}</span>
-                    <span>${new Date(item.timestamp).toLocaleString()}</span>
+        // Group feedback by assignment
+        const feedbackByAssignment = feedback.reduce((acc, item) => {
+            if (!acc[item.assignmentId]) {
+                acc[item.assignmentId] = [];
+            }
+            acc[item.assignmentId].push(item);
+            return acc;
+        }, {});
+
+        feedbackList.innerHTML = Object.entries(feedbackByAssignment).map(([assignmentId, items]) => {
+            const assignment = assignments.find(a => a.id === parseInt(assignmentId));
+            return `
+                <div class="feedback-group">
+                    <h4 class="assignment-title">${assignment ? assignment.title : 'Unknown Assignment'}</h4>
+                    ${items.map(item => `
+                        <div class="feedback-item">
+                            <div class="feedback-meta">
+                                <span class="student-info">From: ${item.studentName}</span>
+                                <span class="feedback-date">${new Date(item.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="feedback-content">${item.feedback}</div>
+                        </div>
+                    `).join('')}
                 </div>
-                <div class="feedback-content">${item.feedback}</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (error) {
         console.error('Error loading feedback:', error);
         const feedbackList = document.querySelector('.feedback-list');
