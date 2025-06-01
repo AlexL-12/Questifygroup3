@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --accent-red: #dc3545;
+            --hover-red: #c82333;
+            --light-gray: #f8f9fa;
+            --success-green: #28a745;
+            --gold: #ffd700;
+            --border-gray: #dee2e6;
+        }
+
+        body {
+            background: var(--light-gray);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .top-nav {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Tab styles */
+        .tabs-container {
+            margin-bottom: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border-gray);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            font-size: 1.1rem;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--primary-blue);
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-gray);
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-subtext {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .assignments-list {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .assignment-card {
+            border: 1px solid #e0e0e0;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .assignment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .assignment-title {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            margin: 0;
+        }
+
+        .due-date {
+            color: var(--accent-red);
+            font-size: 0.9rem;
+        }
+
+        .assignment-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        textarea.input-field {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea.input-field:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+        }
+
+        .submit-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary-blue);
+        }
+
+        .logout-btn {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--hover-red);
+        }
+
+        .submitted {
+            color: var(--success-green);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .submitted::before {
+            content: '✓';
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .submission-form {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .points-display {
+            position: fixed;
+            top: 1rem;
+            right: 8rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+
+        .points-display:hover {
+            transform: translateY(-2px);
+        }
+
+        .points-icon {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .points-value {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .points-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .points-earned {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            display: none;
+            animation: fadeInOut 2s ease-in-out;
+            z-index: 1000;
+        }
+
+        .points-earned.show {
+            display: block;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .points-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--light-gray);
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .points-progress-bar {
+            height: 100%;
+            background: var(--primary-blue);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .achievement-unlocked {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .achievement-unlocked.show {
+            display: block;
+        }
+
+        .achievement-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-icon {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .achievement-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Add styles for points claim popup */
+        .points-claim-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .points-claim-popup.show {
+            display: block;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .points-claim-icon {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .points-claim-title {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .points-claim-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .claim-points-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .claim-points-btn:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            backdrop-filter: blur(4px);
+        }
+
+        .popup-overlay.show {
+            display: block;
+        }
+
+        .lucky-wheel-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            text-align: center;
+            min-width: 400px;
+        }
+
+        .lucky-wheel-popup.show {
+            display: block;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff6b6b 0% 5%,
+                #4dabf7 5% 10%,
+                #51cf66 10% 40%,
+                #ffd43b 40% 95%,
+                #cc5de8 95% 96%,
+                #20c997 96% 97%,
+                #fd7e14 97% 98%,
+                #748ffc 98% 99%,
+                #ff922b 99% 100%
+            );
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform: rotate(0deg);
+            position: relative;
+        }
+
+        .wheel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid var(--primary-blue);
+            z-index: 1;
+        }
+
+        .lucky-wheel-title {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .spin-button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .spin-button:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+
+        .spin-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .exp-notification,
+        .level-up-notification,
+        .special-reward-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            z-index: 2000;
+            text-align: center;
+            animation: fadeInOut 2s ease-in-out;
+        }
+
+        .exp-notification {
+            background: linear-gradient(135deg, #4dabf7, #228be6);
+        }
+
+        .level-up-notification {
+            background: linear-gradient(135deg, #ffd43b, #fab005);
+            padding: 1.5rem 3rem;
+            font-size: 1.2rem;
+        }
+
+        .special-reward-notification {
+            background: linear-gradient(135deg, #cc5de8, #ae3ec9);
+        }
+
+        .buff-indicator {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            z-index: 1000;
+        }
+
+        .buff-timer {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <h1>Student Dashboard</h1>
+        <a href="road-of-knowledge.html" class="points-display">
+            <span class="points-icon">⭐</span>
+            <span class="points-value" id="total-points">0</span>
+            <span class="points-label">Points</span>
+            <div class="level-badge">
+                Level <span id="current-level">1</span>
+            </div>
+        </a>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="total-available">0</div>
+                <div class="stat-label">Available Assignments</div>
+                </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completed-assignments">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-assignments">0</div>
+                <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('unsubmitted')">
+                    📝 Unsubmitted Assignments
+                </button>
+                <button class="tab" onclick="switchTab('submitted')">
+                    ✓ Submitted Assignments
+                </button>
+    </div>
+
+            <div id="unsubmitted-tab" class="tab-content active">
+                <div id="unsubmitted-assignments">
+                    <!-- Unsubmitted assignments will be populated here -->
+                </div>
+                </div>
+
+            <div id="submitted-tab" class="tab-content">
+                <div id="submitted-assignments">
+                    <!-- Submitted assignments will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Points claim popup -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="points-claim-popup" id="pointsClaimPopup">
+        <div class="points-claim-icon">🎉</div>
+        <h2 class="points-claim-title">Assignment Approved!</h2>
+        <p class="points-claim-description">
+            Your assignment "<span id="approvedAssignmentTitle"></span>" has been approved.
+            Claim your points now!
+        </p>
+        <div class="points-value">+<span id="pointsToClaimValue">50</span> points</div>
+        <button class="claim-points-btn" onclick="claimPoints()">
+            Claim Points
+        </button>
+    </div>
+
+    <div class="points-earned" id="points-notification">
+        <span class="points-icon">⭐</span> +<span id="points-earned-value">0</span> points earned!
+    </div>
+
+    <div class="achievement-unlocked" id="achievement-notification">
+        <div class="achievement-header">
+            <span class="achievement-icon">🏆</span>
+            <span class="achievement-title">Achievement Unlocked!</span>
+        </div>
+        <div class="achievement-description" id="achievement-description"></div>
+    </div>
+
+    <!-- Lucky Wheel Popup -->
+    <div class="lucky-wheel-popup" id="luckyWheelPopup">
+        <h2 class="lucky-wheel-title">🎉 Lucky Wheel Unlocked! 🎉</h2>
+        <p>Congratulations on submitting 10 assignments on time!</p>
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel"></div>
+        </div>
+        <button class="spin-button" id="spinButton" onclick="handleWheelSpin()">
+            Spin the Wheel!
+        </button>
+                </div>
+
+    <!-- Active Buffs Display -->
+    <div class="buff-indicator" id="buffIndicator" style="display: none;">
+        <div id="expBuff" style="display: none;">
+            2x EXP Boost - <span class="buff-timer" id="expBuffTimer"></span>
+            </div>
+        <div id="pointsBuff" style="display: none;">
+            2x Points Boost - <span class="buff-timer" id="pointsBuffTimer"></span>
+        </div>
+    </div>
+
+    <script src="student-dashboard.js"></script>
+</body>
+</html> 

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road of Knowledge</title>
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --accent-red: #dc3545;
+            --hover-red: #c82333;
+            --light-gray: #f8f9fa;
+            --success-green: #28a745;
+            --gold: #ffd700;
+            --border-gray: #dee2e6;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-gray);
+        }
+
+        .top-nav {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .road-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .road {
+            position: relative;
+            height: 120px;
+            background: #e9ecef;
+            border-radius: 60px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .milestones {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .milestone {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .milestone.completed {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .milestone.current {
+            background: var(--gold);
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .milestone:hover {
+            transform: scale(1.1);
+        }
+
+        .milestone-info {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            display: none;
+        }
+
+        .milestone:hover .milestone-info {
+            display: block;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .achievements-container {
+            margin-top: 3rem;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .achievement-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-title {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--light-gray);
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .achievement-progress-bar {
+            height: 100%;
+            background: var(--primary-blue);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .achievement-status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .achievement-card.completed {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .achievement-card.completed .achievement-icon {
+            color: var(--success-green);
+        }
+
+        .achievement-card.completed .achievement-status {
+            color: var(--success-green);
+        }
+
+        .buff-indicator {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            z-index: 1000;
+        }
+
+        .buff-timer {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-blue);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <h1>Road of Knowledge</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="level-display">
+                Level <span id="currentLevel">1</span>
+                (<span id="currentExp">0</span>/<span id="nextLevelExp">500</span> EXP)
+            </div>
+            <button onclick="location.href='student-dashboard.html'" class="back-btn">
+                Back to Dashboard
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalPoints">0</div>
+                <div class="stat-label">Total Points</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalExp">0</div>
+                <div class="stat-label">Total EXP</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="onTimeSubmissions">0</div>
+                <div class="stat-label">On-time Submissions</div>
+            </div>
+        </div>
+
+        <div class="road-container">
+            <h2 class="section-title">🎯 Progress to Next Level</h2>
+            <div class="road">
+                <div class="milestones" id="milestones"></div>
+            </div>
+        </div>
+
+        <div class="achievements-container">
+            <h2 class="section-title">🏆 Achievements</h2>
+            <div class="achievement-grid" id="achievementsGrid"></div>
+        </div>
+    </div>
+
+    <!-- Active Buffs Display -->
+    <div class="buff-indicator" id="buffIndicator" style="display: none;">
+        <div id="expBuff" style="display: none;">
+            2x EXP Boost - <span class="buff-timer" id="expBuffTimer"></span>
+        </div>
+        <div id="pointsBuff" style="display: none;">
+            2x Points Boost - <span class="buff-timer" id="pointsBuffTimer"></span>
+        </div>
+    </div>
+
+    <script src="road-of-knowledge.js"></script>
+</body>
+</html> 

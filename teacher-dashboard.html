@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --accent-red: #dc3545;
+            --hover-red: #c82333;
+            --light-gray: #f8f9fa;
+            --success-green: #28a745;
+            --border-gray: #dee2e6;
+        }
+
+        body {
+            background: var(--light-gray);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .top-nav {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .assignment-card {
+            border: 1px solid #e0e0e0;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .assignment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .assignment-title {
+            margin: 0;
+            color: var(--primary-blue);
+        }
+
+        .due-date {
+            color: #666;
+        }
+
+        .assignment-description {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .create-assignment-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea.input-field {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary-blue);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .delete-icon {
+            font-size: 1.2rem;
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <h1>Teacher Dashboard</h1>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </nav>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="total-submissions">0</div>
+                <div class="stat-label">Total Submissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-submissions">0</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="approved-submissions">0</div>
+                <div class="stat-label">Approved</div>
+            </div>
+        </div>
+
+        <div class="create-assignment-form">
+            <h2 class="section-title">📝 Create New Assignment</h2>
+            <div class="form-group">
+                <label for="assignment-title">Assignment Title</label>
+                <input type="text" id="assignment-title" placeholder="Enter assignment title">
+            </div>
+            <div class="form-group">
+                <label for="assignment-description">Description</label>
+                <textarea id="assignment-description" placeholder="Enter assignment description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="assignment-due-date">Due Date</label>
+                <input type="datetime-local" id="assignment-due-date">
+            </div>
+            <button onclick="createAssignment()" class="submit-btn">Create Assignment</button>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab('pending')">Pending Review</button>
+            <button class="tab" onclick="switchTab('approved')">Approved</button>
+        </div>
+
+        <div id="pending-tab" class="tab-content active">
+            <h2 class="section-title">📋 Pending Submissions</h2>
+            <div id="assignments-container"></div>
+        </div>
+
+        <div id="approved-tab" class="tab-content">
+            <h2 class="section-title">✓ Approved Submissions</h2>
+            <div id="assignments-container"></div>
+        </div>
+    </div>
+
+    <script src="teacher-dashboard.js"></script>
+</body>
+</html> 

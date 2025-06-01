@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Platform - Login</title>
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --accent-red: #dc3545;
+            --hover-red: #c82333;
+            --light-gray: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .platform-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .platform-logo h1 {
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-logo p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            background: white;
+        }
+
+        select.input-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .submit-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-1px);
+        }
+
+        .demo-accounts {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .demo-accounts h3 {
+            color: #333;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .demo-account {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        .demo-account strong {
+            color: var(--primary-blue);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="platform-logo">
+                <h1>Educational Platform</h1>
+                <p>Access your learning dashboard</p>
+            </div>
+            
+            <div id="login-form" class="form-container">
+                <div class="input-group">
+                    <label for="role-select">Select Role</label>
+                    <select id="role-select" class="input-field">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" class="input-field" placeholder="Enter your email">
+                </div>
+
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="input-field" placeholder="Enter your password">
+                </div>
+
+                <button onclick="login()" class="submit-btn">Sign In</button>
+            </div>
+
+            <div class="demo-accounts">
+                <h3>Demo Accounts</h3>
+                <div class="demo-grid">
+                    <div class="demo-account">
+                        <strong>Admin</strong>
+                        admin@school.edu<br>
+                        admin123
+                    </div>
+                    <div class="demo-account">
+                        <strong>Teacher</strong>
+                        teacher@school.edu<br>
+                        teacher123
+                    </div>
+                    <div class="demo-account">
+                        <strong>Student</strong>
+                        student1@school.edu<br>
+                        student123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 

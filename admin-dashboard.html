@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --accent-red: #dc3545;
+            --hover-red: #c82333;
+            --light-gray: #f8f9fa;
+            --success-green: #28a745;
+            --border-gray: #dee2e6;
+            --warning-yellow: #ffc107;
+        }
+
+        body {
+            background: var(--light-gray);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .top-nav {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .danger-zone {
+            border: 2px dashed var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .danger-zone h3 {
+            color: var(--accent-red);
+            margin-top: 0;
+        }
+
+        .warning-text {
+            color: var(--warning-yellow);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .student-list {
+            margin-top: 1rem;
+        }
+
+        .student-card {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-stats {
+            display: flex;
+            gap: 1rem;
+            color: #666;
+        }
+
+        .points-input, .exp-input {
+            width: 80px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .reset-btn {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: var(--hover-red);
+        }
+
+        .award-btn {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .award-btn:hover {
+            background: #218838;
+        }
+
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <h1>Admin Dashboard</h1>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </nav>
+
+    <div class="container">
+        <div class="admin-card">
+            <h2>Student Management</h2>
+            <div class="student-list" id="student-list">
+                <!-- Student list will be populated here -->
+            </div>
+        </div>
+
+        <div class="admin-card danger-zone">
+            <h3>⚠️ Danger Zone</h3>
+            <p class="warning-text">These actions cannot be undone!</p>
+            
+            <button onclick="showResetConfirmation('assignments')" class="action-btn reset-btn">
+                Reset All Assignments
+            </button>
+            
+            <button onclick="showResetConfirmation('achievements')" class="action-btn reset-btn" style="margin-left: 1rem;">
+                Reset All Achievements
+            </button>
+            
+            <button onclick="showResetConfirmation('all')" class="action-btn reset-btn" style="margin-left: 1rem;">
+                Reset Everything
+            </button>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="dialog-overlay"></div>
+    <div class="confirm-dialog" id="confirm-dialog">
+        <h3 id="dialog-title">Confirm Action</h3>
+        <p id="dialog-message">Are you sure you want to proceed with this action?</p>
+        <div class="dialog-buttons">
+            <button onclick="hideConfirmDialog()" class="action-btn" style="background: #6c757d; color: white;">Cancel</button>
+            <button id="confirm-action" class="action-btn reset-btn">Confirm</button>
+        </div>
+    </div>
+
+    <script src="admin-dashboard.js"></script>
+</body>
+</html> 
